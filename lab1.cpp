@@ -258,6 +258,7 @@ void check_mouse(XEvent *e)
 				return;
 			}
 		}
+	 }
 	if (e->type == MotionNotify) {
 		//The mouse moved!
 		if (savex != e->xbutton.x || savey != e->xbutton.y) {
@@ -273,7 +274,7 @@ void check_mouse(XEvent *e)
 			}
 
 		}
-		}
+	
 }
 
 int check_keys(XEvent *e)
