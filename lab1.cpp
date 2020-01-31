@@ -43,6 +43,7 @@ using namespace std;
 #include "fonts.h"
 
 const int MAX_PARTICLES = 20000;
+const int NUM_OF_BOXES = 5;
 const float GRAVITY     = 0.1;
 
 //some structures
@@ -65,7 +66,7 @@ struct Particle {
 class Global {
     public:
         int xres, yres;
-        Shape box;
+        Shape box[NUM_OF_BOXES];
         Particle particle[MAX_PARTICLES];
         int n;
         Global();
@@ -129,11 +130,33 @@ Global::Global()
     xres = 800;
     yres = 600;
     //define a box shape
-    box.width = 100;
-    box.height = 10;
-    box.center.x = 120 + 5*65;
-    box.center.y = 500 - 5*60;
+    
+    /*for (int i = 0; i < NUM_OF_BOXES; i++) {
+        box[i].width = 100;
+        box[i].height = 10;
+    }
+    */
+    
+   for (int i = 0; i < NUM_OF_BOXES; i++) {
+        box[i].width = 100;
+        box[i].height = 10;
+    }
+   
+    //Will make cleaner with a loop later
+    box[0].center.x = 120 + 5*65;
+    box[0].center.y = 500 - 5*60;
+    box[1].center.x = 120 + 4*65;
+    box[1].center.y = 500 - 4*60;
+    box[2].center.x = 120 + 3*65;
+    box[2].center.y = 500 - 3*60;
+    box[3].center.x = 120 + 2*65;
+    box[3].center.y = 500 - 2*60;
+    box[4].center.x = 120 + 1*65;
+    box[4].center.y = 500 - 1*60;
+    
+
     n = 0;
+    
 }
 
 //-----------------------------------------------------------------------------
@@ -232,8 +255,8 @@ void makeParticle(int x, int y)
     p->s.center.x = x;
     p->s.center.y = y;
     p->velocity.y = -4.0;
-    p->velocity.y =  ((((float) rand()/(float) RAND_MAX)) * 1.0) +2.0;
-    p->velocity.x =  ((((float) rand()/(float) RAND_MAX)) * 1.0) +2.0;
+    p->velocity.y =  ((((float) rand()/(float) RAND_MAX)) * 1.0) +0.5;
+    p->velocity.x =  ((((float) rand()/(float) RAND_MAX)) * 0.5) +1.0;
     ++g.n;
 
 }
@@ -313,7 +336,7 @@ void movement()
     if (g.n <= 0)
         return;
 
-    for(int i = 0; i < g.n ; i++){
+    for (int i = 0; i < g.n ; i++) {
         Particle *p = &g.particle[i];
 
         p->velocity.y -= GRAVITY;
@@ -321,18 +344,17 @@ void movement()
         p->s.center.y += p->velocity.y;
 
         //check for collision with shapes...
-        Shape * s = &g.box;
-        if (p->s.center.y < (s->center.y + s->height) &&
-                p->s.center.x > s->center.x - s->width &&
-                p->s.center.x < s->center.x + s->width &&
-                p->s.center.y > s->center.y - s->height) {
-            p->s.center.y = s->center.y+s->height;
-            p->velocity.y *= -1.0;
-            p->velocity.y *= 0.5;
+        for (int i = 0; i < NUM_OF_BOXES; i++) {
+            Shape *s = &g.box[i];
+            if (p->s.center.y < (s->center.y + s->height) &&
+                    p->s.center.x > s->center.x - s->width &&
+                    p->s.center.x < s->center.x + s->width &&
+                    p->s.center.y > s->center.y - s->height) {
+                p->s.center.y = s->center.y+s->height;
+                p->velocity.y *= -1.0;
+                p->velocity.y *= 0.5;
+            }
         }
-
-
-
 
         //check for off-screen
         if (p->s.center.y < 0.0) {
@@ -355,19 +377,25 @@ void render()
     Shape *s;
     //Changed color from green to blue
     glColor3ub(0,0,0xff);
-    s = &g.box;
-    glPushMatrix();
-    glTranslatef(s->center.x, s->center.y, s->center.z);
+    
     float w, h;
-    w = s->width;
-    h = s->height;
-    glBegin(GL_QUADS);
-    glVertex2i(-w, -h);
-    glVertex2i(-w,  h);
-    glVertex2i( w,  h);
-    glVertex2i( w, -h);
-    glEnd();
-    glPopMatrix();
+
+    for (int i = 0; i < NUM_OF_BOXES; i++) {
+        s = &g.box[i];
+        glPushMatrix();
+        glTranslatef(s->center.x, s->center.y, s->center.z);
+        
+        w = s->width;
+        h = s->height;
+        glBegin(GL_QUADS);
+        glVertex2i(-w, -h);
+        glVertex2i(-w,  h);
+        glVertex2i( w,  h);
+        glVertex2i( w, -h);
+        glEnd();
+        glPopMatrix();
+    }
+    
     //
     //Draw particles here
     for (int i = 0; i < g.n ; i++){
@@ -386,12 +414,36 @@ void render()
     }
     //
     //Draw your 2D text here
-    Rect r;
-    Shape *b = &g.box;
-    r.bot = b->center.y - (b->height);//2;
-    r.left = b->center.x;
-    ggprint12(&r, 16, 0x00ff0000, "Requirements");
+    //Will make cleaner with for loops later
+    Rect r0;
+    Shape *a = &g.box[0];
+    r0.bot = a->center.y - (a->height);
+    r0.left = a->center.x;
+    ggprint12(&r0, 16, 0x00ff0000, "Maintenance");
     
+    Rect r1;
+    Shape *b = &g.box[1];
+    r1.bot = b->center.y - (b->height);
+    r1.left = b->center.x;
+    ggprint12(&r1, 16, 0x00ff0000, "Testing");
+    
+    Rect r2;
+    Shape *c = &g.box[2];
+    r2.bot = c->center.y - (c->height);
+    r2.left = c->center.x;
+    ggprint12(&r2, 16, 0x00ff0000, "Implementation");
+    
+    Rect r3;
+    Shape *d = &g.box[3];
+    r3.bot = d->center.y - (d->height);
+    r3.left = d->center.x;
+    ggprint12(&r3, 16, 0x00ff0000, "Design");
+    
+    Rect r4;
+    Shape *e = &g.box[4];
+    r4.bot = e->center.y - (e->height);
+    r4.left = e->center.x;
+    ggprint12(&r4, 16, 0x00ff0000, "Requirements");
 }
 
 
