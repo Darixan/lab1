@@ -130,30 +130,17 @@ Global::Global()
     xres = 800;
     yres = 600;
     //define a box shape
-    
-    /*for (int i = 0; i < NUM_OF_BOXES; i++) {
+
+    int i = 0;
+    int j = NUM_OF_BOXES;
+    while (i < NUM_OF_BOXES && j > 0) {
         box[i].width = 100;
         box[i].height = 10;
+        box[i].center.x = 120 + j*65;
+        box[i].center.y = 500 - j*60;
+        i++;
+        j--;
     }
-    */
-    
-   for (int i = 0; i < NUM_OF_BOXES; i++) {
-        box[i].width = 100;
-        box[i].height = 10;
-    }
-   
-    //Will make cleaner with a loop later
-    box[0].center.x = 120 + 5*65;
-    box[0].center.y = 500 - 5*60;
-    box[1].center.x = 120 + 4*65;
-    box[1].center.y = 500 - 4*60;
-    box[2].center.x = 120 + 3*65;
-    box[2].center.y = 500 - 3*60;
-    box[3].center.x = 120 + 2*65;
-    box[3].center.y = 500 - 2*60;
-    box[4].center.x = 120 + 1*65;
-    box[4].center.y = 500 - 1*60;
-    
 
     n = 0;
     
@@ -414,36 +401,37 @@ void render()
     }
     //
     //Draw your 2D text here
-    //Will make cleaner with for loops later
-    Rect r0;
-    Shape *a = &g.box[0];
-    r0.bot = a->center.y - (a->height);
-    r0.left = a->center.x;
-    ggprint12(&r0, 16, 0x00ff0000, "Maintenance");
     
-    Rect r1;
-    Shape *b = &g.box[1];
-    r1.bot = b->center.y - (b->height);
-    r1.left = b->center.x;
-    ggprint12(&r1, 16, 0x00ff0000, "Testing");
-    
-    Rect r2;
-    Shape *c = &g.box[2];
-    r2.bot = c->center.y - (c->height);
-    r2.left = c->center.x;
-    ggprint12(&r2, 16, 0x00ff0000, "Implementation");
-    
-    Rect r3;
-    Shape *d = &g.box[3];
-    r3.bot = d->center.y - (d->height);
-    r3.left = d->center.x;
-    ggprint12(&r3, 16, 0x00ff0000, "Design");
-    
-    Rect r4;
-    Shape *e = &g.box[4];
-    r4.bot = e->center.y - (e->height);
-    r4.left = e->center.x;
-    ggprint12(&r4, 16, 0x00ff0000, "Requirements");
+    Rect r[NUM_OF_BOXES];
+    Shape *b[NUM_OF_BOXES];
+
+    for (int i = 0; i < NUM_OF_BOXES; i++) {
+        b[i] = &g.box[i];
+        r[i].bot = b[i]->center.y - b[i]->height;
+        r[i].left = b[i]->center.x;
+        r[i].center = 1;
+        switch (i) {
+            case 0:
+                ggprint12(&r[i], 16, 0x00ff0000, "Maintenance");
+                break;
+
+            case 1:
+                ggprint12(&r[i], 16, 0x00ff0000, "Testing");
+                break;
+
+            case 2:
+                ggprint12(&r[i], 16, 0x00ff0000, "Implementation");
+                break;
+            
+            case 3:
+                ggprint12(&r[i], 16, 0x00ff0000, "Design");
+                break;
+
+            case 4:
+                ggprint12(&r[i], 16, 0x00ff0000, "Requirements");
+                break;
+        }        
+    }
 }
 
 
